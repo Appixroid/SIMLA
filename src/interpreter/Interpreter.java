@@ -1,222 +1,106 @@
 package interpreter;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
-public class Interpreter
+import interpreter.exception.SimlaException;
+import interpreter.instructions.Instructions;
+
+public class Interpreter 
 {
 	/**
-	 * Type constant
+	 * Version of the SIMLA Language
 	 */
-	public static final String INTEGER = "Integer", REAL = "Real", COMPLEX = "Complex", STRING = "String", BOOLEAN = "Boolean", UNSIGNED = "Unsigned";
-	/**
-	 * List of function to use 
-	 * key -> func label
-	 * value -> func code
-	 */
-	private Hashtable<String, String> funcMap = new Hashtable<String, String>();
-	
-	/**
-	 * List of var to use
-	 * key -> var label
-	 * value -> Object[] ([0] String var type, [1]Int var index)
-	 */
-	private Hashtable<String, Object[]> varMap = new Hashtable<String, Object[]>();
-	
-	/**
-	 * Int list
-	 */
-	private ArrayList<Integer> intList = new ArrayList<Integer>();
-	/**
-	 * Real list
-	 */
-	private ArrayList<Double> realList = new ArrayList<Double>();
-	/**
-	 * Complex list
-	 */
-	private ArrayList<int[]> complexList = new ArrayList<int[]>();
-	/**
-	 * String list
-	 */
-	private ArrayList<String> stringList = new ArrayList<String>();
-	/**
-	 * Boolean list
-	 */
-	private ArrayList<Boolean> booleanList = new ArrayList<Boolean>();
-	/**
-	 * Unsigned list
-	 */
-	private ArrayList<Integer> unsignedList = new ArrayList<Integer>();
-	
-	/**
-	 * Scanner obj
-	 */
-	private Scanner sc = new Scanner(System.in);
+	public static final String VERSION = "SIMLA Version 1.0.0";
 
-	public Interpreter()
+	/**
+	 * Parse the String by line and read each line
+	 * @param code : the String to read
+	 * @throws SimlaException
+	 */
+	public static void read(String code) throws SimlaException
 	{
+		String[] lines = code.split(KEYWORDS.INSTRUCTION_SEPARATOR);
+		int lineCount = 0;
 		
-	}	
-	
-	public void read(String code)
-	{
-		String[] linedCode = code.split("\n");
-		
-		for(int i = 0; i < linedCode.length; i ++)
+		for(String line : lines)
 		{
-			readLine(linedCode[i]);
+			lineCount++;
+			readLine(line, lineCount);
 		}
 	}
 	
-	public void readLine(String line)
+	/**
+	 * Interpretate the given String who is the line-th line 
+	 * @param instruction : the line to read
+	 * @param line : the line number
+	 * @throws SimlaException
+	 */
+	public static void readLine(String instruction, int line) throws SimlaException
 	{
-		if(line.startsWith("com "))
-		{
-			//Comentary
-		}
-		else if(line.startsWith("call "))
-		{
-			callInstruction(line.split("call ")[1]);
-		}
-		else if(line.startsWith("var "))
-		{
-			
-		}
-		else if(line.startsWith("calc "))
-		{
-			
-		}
-		else if(line.startsWith("if "))
-		{
-			
-		}
-		else if(line.startsWith("loop if "))
-		{
-			
-		}
-		else if(line.startsWith("for "))
-		{
-			
-		}
-		else if(line.startsWith("func "))
-		{
-			
-		}
-		else
-		{
-			//TODO Unknow line
-		}
+		Instructions.interpretate(instruction, line);
 	}
 	
-	private Object[] getVar(String name)
+	public static void main(String[] args)
 	{
-		try
+		if(args.length == 0)
 		{
-			return varMap.get(name);
-		}catch(NullPointerException e){
-			//TODO Unknow var
-			return null;
-		}
-	}
-	
-	private void callInstruction(String call)
-	{
-		int index = call.indexOf(" ");
-		
-		if(index > -1)
-		{
-			String functionName = call.substring(0, index);
-			String[] args = call.substring(index + 1, call.length()).split(",");
-			
-			switch(functionName)
+			try
 			{
-				case "output":
-					String output = "";
-					
-					for(int i = 0; i < args.length; i++)
-					{
-						if(args[i].startsWith("\"") && args[i].endsWith("\""))
-						{
-							output += args[i];
-						}
-						else if(args[i].startsWith("\"") || args[i].endsWith("\""))
-						{
-							//TODO String error
-						}
-						else
-						{
-							Object[] temp;
-							if((temp = getVar(args[i])) != null)
-							{
-								switch((String) temp[0])
-								{
-									case INTEGER:
-										output += intList.get((int) temp[1]);
-										break;
-										
-									case REAL:
-										output += realList.get((int) temp[1]);
-										break;
-										
-									case STRING:
-										output += stringList.get((int) temp[1]);
-										break;
-										
-									case BOOLEAN:
-										output += booleanList.get((int) temp[1]);
-										break;
-										
-									case COMPLEX:
-										output += complexList.get((int) temp[1]);
-										break;
-										
-									case UNSIGNED:
-										output += unsignedList.get((int) temp[1]);
-										break;
-								}
-							}
-						}
-					}
-					
-					inbuildOutput(output);
-					break;
-					
-				case "input":
-					break;
-					
-				default:
-					
+				BufferedReader reader = new BufferedReader(new FileReader("Exemple.sml"));
+				
+				String code = "";
+				String line;
+				while((line = reader.readLine()) != null)
+				{
+					code += line + "\n";
+				}
+				
+				reader.close();
+								
+				try
+				{
+					read(code);
+				} catch (SimlaException e) 
+				{
+					System.err.println(e.getMessage());
+				}
+			} catch (IOException e) 
+			{
+				System.err.println("File Not Found Or Cannot Be Read");
+			}
+		}
+		else if(args.length == 1)
+		{
+			try
+			{
+				BufferedReader reader = new BufferedReader(new FileReader(args[0]));
+				
+				String code = "";
+				String line;
+				while((line = reader.readLine()) != null)
+				{
+					code += line + "\n";
+				}
+				
+				reader.close();
+				
+				try
+				{
+					read(code);
+				} catch (SimlaException e) 
+				{
+					System.err.println(e.getMessage());
+				}
+			} catch (IOException e) 
+			{
+				System.err.println("File Not Found Or Cannot Be Read");
 			}
 		}
 		else
 		{
-			switch(call)
-			{
-				case "output":
-					inbuildOutput("\n");
-					break;
-
-				case "input":
-					break;
-					
-				case "version":
-					inbuildOutput("SIMLA version pre-alpha 0.1");
-					break;
-					
-					default:
-			}
+			System.err.println("To Much Arguments");
 		}
-	}
-	
-	private void inbuildOutput(String output)
-	{
-		System.out.println(output);
-	}
-	
-	private String inbuildInput(String message)
-	{
-		System.out.println(message);
-		return sc.nextLine();
 	}
 }

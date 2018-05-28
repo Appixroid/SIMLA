@@ -101,5 +101,14 @@ for 0;1;5 in i
 	call output arr[i]
 endfor
 
+func void decompte x
+call output x
+calc x - 1 in x
+if x > 0
+call decompte x
+endif
+endfunc
+call decompte 10
+
 com End Program
 call output "End"

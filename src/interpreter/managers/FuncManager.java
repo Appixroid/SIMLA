@@ -6,6 +6,7 @@ import java.util.Map;
 import interpreter.Interpreter;
 import interpreter.KEYWORDS;
 import interpreter.exception.SimlaException;
+import interpreter.instructions.DataInstruction;
 import interpreter.instructions.Instructions;
 import interpreter.instructions.inBuild.GeneralFunction;
 import interpreter.instructions.inBuild.IOFunction;
@@ -65,43 +66,104 @@ public class FuncManager
 			
 	}
 	
+	/**
+	 * Exec a function created by the user
+	 * @param label : The label of the function
+	 * @param args : The arguments for the function
+	 * @throws SimlaException
+	 */
 	public static void execFunction(String label, String[] args) throws SimlaException
 	{
 		Function func = getFunc(label);
 		
 		String saveVar = null;
-		String[] funcArgs = args;
-		
+		String[] funcArgs = new String[0];
+		String code = func.getCode();
+		func.call();
+
+		//Assigment processing
 		if(String.join(" ", args).contains(KEYWORDS.ARGUMENT_SEPARATOR + KEYWORDS.ASSIGNMENT_KEYWORD + KEYWORDS.ARGUMENT_SEPARATOR) && args[args.length - 2].equals(KEYWORDS.ASSIGNMENT_KEYWORD))
 		{
 			saveVar = args[args.length - 1];
 			DataManagers.changeType(saveVar, TYPES.Null);
 			
 			funcArgs = new String[args.length - 2];
-			
 			for(int i = 0; i < args.length - 2; i++)
-			{
-				funcArgs[i] = args[i];
+			{				
+				String str = "";
+				if(args[i].startsWith(KEYWORDS.STRING_START))
+				{
+					Object[] obj = DataInstruction.readString(args, i);
+					i = (int) obj[1];
+					str = (String) obj[0];
+					
+					str = str.startsWith("\"") ? str.substring(1, str.length()) : str;
+				}
+				else if(!Character.isDigit(args[i].charAt(0)))
+				{
+					str += DataManagers.getVar(args[i]).getValue();
+				}
+				else
+				{
+					str += args[i];
+				}
+				
+				funcArgs[i] = str;
+
 			}
 		}
 		else if(String.join(" ", args).contains(KEYWORDS.ARGUMENT_SEPARATOR + KEYWORDS.ASSIGNMENT_KEYWORD + KEYWORDS.ARGUMENT_SEPARATOR) && !args[args.length - 2].equals(KEYWORDS.ASSIGNMENT_KEYWORD))
 		{
+			func.uncall();
+			
 			/*
 			 * Exception if the assignement statement is not at the end
 			 */
 			throw new SimlaException(SimlaException.UNEXPECTED_ARGUMENTS);
 		}
+		else if(!String.join(" ", args).contains(KEYWORDS.ARGUMENT_SEPARATOR + KEYWORDS.ASSIGNMENT_KEYWORD + KEYWORDS.ARGUMENT_SEPARATOR) && args.length > 0)
+		{
+			funcArgs = new String[args.length];
+			for(int i = 0; i < args.length; i++)
+			{				
+				String str = "";
+				if(args[i].startsWith(KEYWORDS.STRING_START))
+				{
+					Object[] obj = DataInstruction.readString(args, i);
+					i = (int) obj[1];
+					str = (String) obj[0];
+					
+					str = str.startsWith("\"") ? str.substring(1, str.length()) : str;
+				}
+				else if(!Character.isDigit(args[i].charAt(0)))
+				{
+					str += DataManagers.getVar(args[i]).getValue();
+				}
+				else
+				{
+					str += args[i];
+				}
+				funcArgs[i] = str;
+
+			}
+		}
 		
+		//Args Processing
 		if(funcArgs.length == func.getArgs().length)
 		{
 			for(int i = 0; i < funcArgs.length; i++)
 			{
-				DataManagers.newVar(func.getArgs()[i], TYPES.getType(funcArgs[i]));
-				DataManagers.setVar(func.getArgs()[i], funcArgs[i]);
+				DataManagers.newVar(func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall(), TYPES.getType(funcArgs[i]));
+				DataManagers.setVar(func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall(), funcArgs[i]);
+				code = code.replaceAll(" " + func.getArgs()[i] + "\n", " " + func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall() + "\n");
+				code = code.replaceAll(" " + func.getArgs()[i] + "\t", " " + func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall() + "\t");
+				code = code.replaceAll(" " + func.getArgs()[i] + " ", " " + func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall() + " ");
 			}	
 		}
 		else if(funcArgs.length < func.getArgs().length)
 		{
+			func.uncall();
+			
 			/*
 			 * Exception if argument are missing
 			 */
@@ -110,22 +172,24 @@ public class FuncManager
 		}
 		else if(funcArgs.length > func.getArgs().length)
 		{
+			func.uncall();
+			
 			/*
 			 * Exception if argument are unexpected
 			 */
 			throw new SimlaException(SimlaException.UNEXPECTED_ARGUMENTS);
 		}
 		
+		//Return Processing
 		if(func.getReturnType() != TYPES.Null)
 		{
-			func.call();
-			DataManagers.newVar(func.getLabel() + func.getCurrentCall(), func.getReturnType());
-			DataManagers.setVar(func.getLabel() + func.getCurrentCall(), 0);
-			Instructions.returnLabel = func.getLabel() + func.getCurrentCall();
+			DataManagers.newVar(func.getLabel() + "__return__function__" + func.getCurrentCall(), func.getReturnType());
+			DataManagers.setVar(func.getLabel() + "__return__function__" + func.getCurrentCall(), 0);
+			Instructions.returnLabel = func.getLabel() + "__return__function__" + func.getCurrentCall();
 		}
 		
 		Instructions.inFunction = true;
-		Interpreter.read(func.getCode());
+		Interpreter.read(code);
 		Instructions.inFunction = false;
 		
 		if(func.getReturnType() == TYPES.Null)
@@ -139,10 +203,14 @@ public class FuncManager
 		{
 			if(saveVar != null)
 			{
-				DataManagers.setVar(saveVar, DataManagers.getVar(func.getLabel() + func.getCurrentCall()).getValue());
+				DataManagers.setVar(saveVar, DataManagers.getVar(func.getLabel() + "__return__function__" + func.getCurrentCall()).getValue());
 			}
 			
-			DataManagers.delVar(func.getLabel() + func.getCurrentCall());
+			DataManagers.delVar(func.getLabel() + "__return__function__" + func.getCurrentCall());
+			for(int i = 0; i < funcArgs.length; i++)
+			{
+				DataManagers.delVar(func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall());
+			}	
 			func.uncall();
 			Instructions.returnLabel = null;
 		}

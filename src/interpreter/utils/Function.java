@@ -9,8 +9,9 @@ public class Function
 	private String[] args;
 	private TYPES returnType;
 	private int currentCall;
+	private int functionOffset;
 	
-	public Function(String label, TYPES returnType, String... args)
+	public Function(String label, TYPES returnType, int offset, String... args)
 	{
 		this.label = label;
 		this.args = args;
@@ -18,6 +19,7 @@ public class Function
 		this.code = "";
 		this.returnType = returnType;
 		this.currentCall = 0;
+		this.functionOffset = offset;
 	}
 
 	public String getLabel()
@@ -58,5 +60,10 @@ public class Function
 	public void uncall()
 	{
 		this.currentCall--;
+	}
+	
+	public int getOffset()
+	{
+		return this.functionOffset;
 	}
 }

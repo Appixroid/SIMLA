@@ -1,6 +1,7 @@
 package interpreter.utils.register;
 
 import interpreter.exception.SimlaException;
+import interpreter.instructions.Instructions;
 import interpreter.managers.DataManagers.TYPES;
 import interpreter.managers.FuncManager;
 import interpreter.utils.Function;
@@ -13,7 +14,7 @@ public class FunctionRegister extends AbstractRegister
 	{
 		super(source, target);
 		
-		this.function = new Function(label, TYPES.getTypes(returnType), args);
+		this.function = new Function(label, TYPES.getTypes(returnType), Instructions.currentLine, args);
 	}
 
 	@Override

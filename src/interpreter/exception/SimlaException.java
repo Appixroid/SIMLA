@@ -48,7 +48,7 @@ public class SimlaException extends Exception
 	 */
 	public SimlaException(String message) 
 	{
-		super(message + " @" +Instructions.currentLine + " :: " + Instructions.currentInstruction);
+		super(message + " @" + Instructions.currentLine + " :: " + Instructions.currentInstruction);
 	}
 
 }

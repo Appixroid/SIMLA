@@ -19,10 +19,10 @@ public class Interpreter
 	 * @param code : the String to read
 	 * @throws SimlaException
 	 */
-	public static void read(String code) throws SimlaException
+	public static void read(String code, int lineStart) throws SimlaException
 	{
 		String[] lines = code.split(KEYWORDS.INSTRUCTION_SEPARATOR);
-		int lineCount = 0;
+		int lineCount = lineStart;
 		
 		for(String line : lines)
 		{
@@ -61,7 +61,7 @@ public class Interpreter
 								
 				try
 				{
-					read(code);
+					read(code, 0);
 				} catch (SimlaException e) 
 				{
 					System.err.println(e.getMessage());
@@ -88,7 +88,7 @@ public class Interpreter
 				
 				try
 				{
-					read(code);
+					read(code, 0);
 				} catch (SimlaException e) 
 				{
 					System.err.println(e.getMessage());

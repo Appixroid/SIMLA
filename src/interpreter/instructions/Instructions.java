@@ -27,8 +27,11 @@ public class Instructions
 	 */
 	public static void interpretate(String instruction, int line) throws SimlaException
 	{		
-		currentInstruction = instruction;
-		currentLine = line;
+		if(!hasToRegister)
+		{
+			currentInstruction = instruction;
+			currentLine = line;
+		}
 		
 		instruction = deleteBlank(instruction);
 		

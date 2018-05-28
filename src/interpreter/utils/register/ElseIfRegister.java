@@ -26,7 +26,7 @@ public class ElseIfRegister extends AbstractRegister
 		}
 		else if(Instructions.lastCondition == false && this.execute)
 		{
-			Interpreter.read(this.codeRegistered);
+			Interpreter.read(this.codeRegistered, Instructions.currentLine);
 			Instructions.lastCondition = this.execute;
 		}
 	}

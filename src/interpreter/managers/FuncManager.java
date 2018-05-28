@@ -189,7 +189,11 @@ public class FuncManager
 		}
 		
 		Instructions.inFunction = true;
-		Interpreter.read(code);
+		int beginLine = Instructions.currentLine;
+
+		Interpreter.read(code, func.getOffset());
+		
+		Instructions.currentLine = beginLine;
 		Instructions.inFunction = false;
 		
 		if(func.getReturnType() == TYPES.Null)

@@ -19,7 +19,7 @@ public class IfRegister extends AbstractRegister
 	{				
 		if(this.execute)
 		{
-			Interpreter.read(this.codeRegistered);
+			Interpreter.read(this.codeRegistered, Instructions.currentLine);
 		}
 		
 		Instructions.lastCondition = this.execute;

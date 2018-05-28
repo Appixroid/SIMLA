@@ -3,6 +3,7 @@ package interpreter.utils.register;
 import interpreter.Interpreter;
 import interpreter.exception.SimlaException;
 import interpreter.instructions.DataInstruction;
+import interpreter.instructions.Instructions;
 
 public class LoopRegister extends AbstractRegister
 {
@@ -21,7 +22,7 @@ public class LoopRegister extends AbstractRegister
 		{
 			while((boolean) DataInstruction.evaluateExpression(expression).getValue())
 			{
-				Interpreter.read(this.codeRegistered);
+				Interpreter.read(this.codeRegistered, Instructions.currentLine);
 			}	
 		} catch(ClassCastException e)
 		{

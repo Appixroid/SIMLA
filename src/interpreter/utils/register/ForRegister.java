@@ -3,6 +3,7 @@ package interpreter.utils.register;
 import interpreter.Interpreter;
 import interpreter.exception.SimlaException;
 import interpreter.instructions.DataInstruction;
+import interpreter.instructions.Instructions;
 import interpreter.managers.DataManagers;
 
 public class ForRegister extends AbstractRegister
@@ -24,14 +25,14 @@ public class ForRegister extends AbstractRegister
 	@Override
 	public void execute() throws SimlaException
 	{	
-		Interpreter.read(init);
+		Interpreter.read(init, Instructions.currentLine);
 		
 		this.codeRegistered += step;
 		try
 		{
 			while((boolean) DataInstruction.evaluateExpression(expression).getValue())
 			{
-				Interpreter.read(this.codeRegistered);
+				Interpreter.read(this.codeRegistered, Instructions.currentLine);
 			}	
 		} catch(ClassCastException e)
 		{

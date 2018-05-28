@@ -23,7 +23,7 @@ public class ElseRegister extends AbstractRegister
 		}
 		else if(Instructions.lastCondition == false)
 		{
-			Interpreter.read(this.codeRegistered);
+			Interpreter.read(this.codeRegistered, Instructions.currentLine);
 			Instructions.lastCondition = null;
 		}
 	}

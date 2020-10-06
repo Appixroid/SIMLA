@@ -7,17 +7,19 @@ public class Function
 	private String label;
 	private String code;
 	private String[] args;
+	private boolean returnArray;
 	private TYPES returnType;
 	private int currentCall;
 	private int functionOffset;
 	
-	public Function(String label, TYPES returnType, int offset, String... args)
+	public Function(String label, TYPES returnType, boolean returnArray, int offset, String... args)
 	{
 		this.label = label;
 		this.args = args;
 		
 		this.code = "";
 		this.returnType = returnType;
+		this.returnArray = returnArray;
 		this.currentCall = 0;
 		this.functionOffset = offset;
 	}
@@ -40,6 +42,11 @@ public class Function
 	public TYPES getReturnType()
 	{
 		return returnType;
+	}
+	
+	public boolean returnArray()
+	{
+		return this.returnArray;
 	}
 
 	public void addCode(String code)

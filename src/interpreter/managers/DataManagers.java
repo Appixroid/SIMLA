@@ -139,6 +139,50 @@ public class DataManagers
 	}
 	
 	/**
+	 * Set the default value for the whole array
+	 * @param label : the label of the array
+	 * @param defaultValue : the default value to set
+	 * @throws SimlaException 
+	 */
+	public static void setArray(String label, Object defaultValue) throws SimlaException
+	{
+		if(isArray(label))
+		{
+			for(int i = 0; i <arrayMap.get(label).getSize(); i++)
+			{
+				arrayMap.get(label).set(i, defaultValue);
+			}
+		}
+		else
+		{
+			throw new SimlaException(SimlaException.UNKNOW_VARIABLE);
+		}
+	}
+	
+	/**
+	 * Copy an array in another
+	 * @param label : the target array
+	 * @param arrayToCopy : the array to copy
+	 * @throws SimlaException 
+	 */
+	public static void setArray(String label, String arrayToCopy) throws SimlaException
+	{
+		if(isArray(label) && isArray(arrayToCopy))
+		{
+			arrayMap.get(label).setSize(arrayMap.get(arrayToCopy).getSize());
+			
+			for(int i = 0; i < arrayMap.get(label).getSize(); i++)
+			{
+				arrayMap.get(label).set(i, arrayMap.get(arrayToCopy).get(i));
+			}
+		}
+		else
+		{
+			throw new SimlaException(SimlaException.UNKNOW_VARIABLE);
+		}
+	}
+	
+	/**
 	 * Change the type of the var with the given label
 	 * @param label : label of the var
 	 * @param type : new type of the var
@@ -408,7 +452,6 @@ public class DataManagers
 	
 	/**
 	 * Enum of the existing var types
-	 * @author parentl
 	 *
 	 */
 	public enum TYPES
@@ -421,19 +464,19 @@ public class DataManagers
 		
 		public static TYPES getTypes(String type)
 		{
-			if (type.equals(KEYWORDS.INTEGER_STRING))
+			if (type.equals(KEYWORDS.INTEGER_STRING) || (type.equals(KEYWORDS.INTEGER_STRING) && type.contains(KEYWORDS.ARRAY_INDEX_START) && type.endsWith(KEYWORDS.ARRAY_INDEX_END)))
 			{
 				return Integer;
 			}				
-			else if ((type.equals(KEYWORDS.REAL_STRING)))
+			else if ((type.equals(KEYWORDS.REAL_STRING)) || (type.equals(KEYWORDS.REAL_STRING) && type.contains(KEYWORDS.ARRAY_INDEX_START) && type.endsWith(KEYWORDS.ARRAY_INDEX_END)))
 			{
 				return Real;
 			}				
-			else if ((type.equals(KEYWORDS.STRING_STRING)))
+			else if ((type.equals(KEYWORDS.STRING_STRING)) || (type.equals(KEYWORDS.STRING_STRING) && type.contains(KEYWORDS.ARRAY_INDEX_START) && type.endsWith(KEYWORDS.ARRAY_INDEX_END)))
 			{
 				return String;
 			}				
-			else if ((type.equals(KEYWORDS.BOOLEAN_STRING)))
+			else if ((type.equals(KEYWORDS.BOOLEAN_STRING)) || (type.equals(KEYWORDS.BOOLEAN_STRING) && type.contains(KEYWORDS.ARRAY_INDEX_START) && type.endsWith(KEYWORDS.ARRAY_INDEX_END)))
 			{
 				return Boolean;
 			}
@@ -441,6 +484,11 @@ public class DataManagers
 			{
 				return Null;
 			}
+		}
+		
+		public static boolean isArray(String type)
+		{
+			return type.endsWith(KEYWORDS.ARRAY_INDEX_START + KEYWORDS.ARRAY_INDEX_END);
 		}
 		
 		public String toString()

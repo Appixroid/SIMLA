@@ -51,6 +51,7 @@ public class KEYWORDS
 	public static final String REAL_STRING = "Real";
 	public static final String STRING_STRING  = "String";
 	public static final String BOOLEAN_STRING = "Boolean";
+	public static final String ARRAY_STRING = "Array";
 	public static final String NULL_STRING = "Null";
 	public static final String VOID_STRING = "void";
 	

@@ -82,4 +82,10 @@ public class Array<T>
 	{
 		return this.tab.length;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void setSize(int newSize)
+	{
+		this.tab = (Var<T>[]) new Var[newSize];
+	}
 }

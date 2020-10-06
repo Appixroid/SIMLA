@@ -23,6 +23,8 @@ public class SimlaException extends Exception
 	public static final String NOT_A_SIZE = "Not An Array Size";
 	public static final String NOT_A_INDEX = "Not A Valid Index";
 	public static final String ARRAY_CAST = "Array Cannot Be Cast";
+	public static final String ARRAY_COPY = "Array Cannot Be Copied";
+
 	
 	public static final String CREATE_NULL_VARIABLE = "Cannot Create Null Variable";
 	public static final String UNFINISHED_STRING = "Unfinished String";

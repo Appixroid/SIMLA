@@ -181,11 +181,17 @@ public class FuncManager
 		}
 		
 		//Return Processing
+		if(func.returnArray())
+		{
+			Instructions.returnLabel = func.getLabel() + "__return__function__array__" + func.getCurrentCall();
+			DataManagers.newArray(Instructions.returnLabel, func.getReturnType(), 0);
+			DataManagers.setArray(Instructions.returnLabel, null);
+		}
 		if(func.getReturnType() != TYPES.Null)
 		{
-			DataManagers.newVar(func.getLabel() + "__return__function__" + func.getCurrentCall(), func.getReturnType());
-			DataManagers.setVar(func.getLabel() + "__return__function__" + func.getCurrentCall(), 0);
 			Instructions.returnLabel = func.getLabel() + "__return__function__" + func.getCurrentCall();
+			DataManagers.newVar(Instructions.returnLabel, func.getReturnType());
+			DataManagers.setVar(Instructions.returnLabel, 0);
 		}
 		
 		Instructions.inFunction = true;
@@ -203,26 +209,29 @@ public class FuncManager
 				DataManagers.setVar(saveVar, "NULL");
 			}
 		}
+		else if(func.returnArray())
+		{
+			if(saveVar != null)
+			{
+				DataManagers.setArray(saveVar, Instructions.returnLabel);
+			}
+		}
 		else
 		{
 			if(saveVar != null)
 			{
-				DataManagers.setVar(saveVar, DataManagers.getVar(func.getLabel() + "__return__function__" + func.getCurrentCall()).getValue());
+				DataManagers.setVar(saveVar, DataManagers.getVar(Instructions.returnLabel).getValue());
 			}
 			
-			DataManagers.delVar(func.getLabel() + "__return__function__" + func.getCurrentCall());
-			for(int i = 0; i < funcArgs.length; i++)
-			{
-				DataManagers.delVar(func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall());
-			}	
-			func.uncall();
-			Instructions.returnLabel = null;
+			DataManagers.delVar(Instructions.returnLabel);
 		}
 		
 		for(int i = 0; i < funcArgs.length; i++)
 		{
-			DataManagers.delVar(func.getArgs()[i]);
-		}
+			DataManagers.delVar(func.getArgs()[i] + "__arg__" + i + "__function__" + func.getCurrentCall());
+		}	
+		func.uncall();
+		Instructions.returnLabel = null;
 	}
 	
 	/**

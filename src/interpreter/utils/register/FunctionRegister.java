@@ -14,7 +14,7 @@ public class FunctionRegister extends AbstractRegister
 	{
 		super(source, target);
 		
-		this.function = new Function(label, TYPES.getTypes(returnType), Instructions.currentLine, args);
+		this.function = new Function(label, TYPES.getTypes(returnType), TYPES.isArray(returnType), Instructions.currentLine, args);
 	}
 
 	@Override
